@@ -1,0 +1,86 @@
+#map {
+  height: 50vh;
+  width: 60%;
+}
+#mapWrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 20px;
+}
+#searchWrapper{
+  padding:20px;
+}
+p{
+  margin:0;
+}
+.inputWrapper{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.titleSearch{
+  padding: 20px 0px;
+  font-weight: 900;
+  font-size:2rem;
+}
+.hide{
+  display: none;
+}
+.custom-select{
+  margin: 0!important;
+}
+.mainColor{
+  color:#1a1c85
+}
+.secondColor{
+  color:#f7c30d;
+}
+.secondColorBg{
+  background-color:#f7c30d;
+}
+.filterIntro{
+  font-weight: bold;
+}
+.textBold{
+  font-weight: bold;
+}
+button{
+  border: 0;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+select, input{
+  background-color: lightgray!important;
+  color: gray!important;
+  font-weight: 500!important;
+}
+#searchCourses{
+  padding: 20px 0px;
+}
+#resultsWrapper{
+  padding: 20px;
+}
+.card{
+  background-color: #DDEEFF;
+  margin: 10px 0px;
+  padding:20px;
+  flex-direction: row !important;
+}
+.card > h6{
+  display: inline-block;
+  width: 200px;
+  margin: 20px;
+}
+.card > button {
+  height: 50px;
+}
+#trainingDetails{
+  display: inline-block;
+  width: 400px;
+  margin: 20px;
+}
