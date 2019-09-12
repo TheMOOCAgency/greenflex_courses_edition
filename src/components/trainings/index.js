@@ -147,11 +147,6 @@ export default function Locat(props) {
     handleClickOpen();
   }
 
-  function saveModifiedTraining(newLocation) {
-    // console.log(newLocation)
-    props.locations[newLocation.sites.id] = newLocation;
-    handleClickClose();
-  }
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
@@ -160,6 +155,7 @@ export default function Locat(props) {
           <Paper className={classes.paper}>
             {props.locations.map(function(location, i){
               return <ExpansionPanel
+              defaultExpanded="true"
               key={i}>
                 <ExpansionPanelSummary
                   className={classes.exp}
@@ -240,9 +236,9 @@ export default function Locat(props) {
         handleClose={handleClickClose}
         modifiedTraining={modifiedTraining}
         getAdress={getAdress}
-
         handleChange={props.handleChange}
         validation= {props.validation}
+        addNewSession={props.addNewSession}
       />
     </div>
   );

@@ -1,9 +1,8 @@
 import React from 'react';
 import './index.css';
-import {Dialog, DialogContent, styled, Container, TextField, Typography, Grid, Slide, Tooltip, IconButton, Divider, MenuItem} from '@material-ui/core/';
+import {Dialog, DialogContent, styled, Container, TextField, Typography, Grid, Slide, Tooltip, IconButton, Divider} from '@material-ui/core/';
 import * as styledMU from '@material-ui/core/styles';
 import DeleteIcon from '@material-ui/icons/Delete';
-// import EditIcon from '@material-ui/icons/Edit';
 import AddCircle from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
@@ -31,22 +30,6 @@ const CloseIconStyled = styled(CloseIcon)({
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const BackgroundContainer = styledMU.styled(Container)({
-    paddingTop: '20px',
-    paddingBottom: '30px',
-    backgroundColor: 'rgba(243, 144, 0, 0.1)',
-    maxWidth: 'none'
-});
-
-const CenterContentGrid = styledMU.styled(Grid)({
-    width: 168,
-    height: 177,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column'
 });
 
 const PaddingTypography = styledMU.styled(Typography)({
@@ -237,6 +220,7 @@ export default class PopupForm extends React.Component {
                             <IconButton
                                 aria-label={'Ajouter une session'}
                                 color='primary'
+                                onClick={() => this.props.addNewSession()}
                             >
                                 <AddCircle />
                             </IconButton>
@@ -246,7 +230,7 @@ export default class PopupForm extends React.Component {
                         <Tooltip title={'Quitter en sauvegardant les modifications'}>
                             <DoneIcon
                                 aria-label='sauvegarder'
-                                onClick={() => this.props.validation()}
+                                onClick={() => this.props.validation(this.props.handleClose)}
                             />
                         </Tooltip>
                         <Tooltip title={'Quitter sans sauvegarder'}>
