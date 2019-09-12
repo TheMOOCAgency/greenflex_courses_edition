@@ -127,7 +127,7 @@ const getAdress = function (location) {
   return keys
 }
 
-export default function Locatete(props) {
+export default function Locat(props) {
   const classes = useStyles();
   
   const [open, setOpen] = useState(false);
@@ -147,6 +147,11 @@ export default function Locatete(props) {
     handleClickOpen();
   }
 
+  function saveModifiedTraining(newLocation) {
+    // console.log(newLocation)
+    props.locations[newLocation.sites.id] = newLocation;
+    handleClickClose();
+  }
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
@@ -157,7 +162,7 @@ export default function Locatete(props) {
               return <ExpansionPanel
               key={i}>
                 <ExpansionPanelSummary
-                className={classes.exp}
+                  className={classes.exp}
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel1c-content"
                   id="panel1c-header"
@@ -235,6 +240,9 @@ export default function Locatete(props) {
         handleClose={handleClickClose}
         modifiedTraining={modifiedTraining}
         getAdress={getAdress}
+
+        handleChange={props.handleChange}
+        validation= {props.validation}
       />
     </div>
   );

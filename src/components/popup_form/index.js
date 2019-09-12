@@ -57,23 +57,26 @@ export default class PopupForm extends React.Component {
     constructor(props){
         super(props)
         this.getElementDetail = this.getElementDetail.bind(this)
-        this.getSession = this.getSession.bind(this)
+        this.getFormatedDate = this.getFormatedDate.bind(this)
     }
-
     getElementDetail(element) {
         return this.props.modifiedTraining.sites.adresse[element]
     }
 
-    getSession(element) {
-        return this.props.modifiedTraining.sites.adresse[element]
+    getFormatedDate(date) {
+        date=date.split('/');
+        date=date[2]+'-'+date[1]+'-'+date[0];
+        return date
     }
 
-    handler(){
-        
+    getJsonDate(date) {
+        date=date.split('-');
+        date=date[2]+'/'+date[1]+'/'+date[0];
+        return date
     }
 
     render() {
-        //console.log(this.props.modifiedTraining);
+        // console.log(this.props.modifiedTraining);
         return (
             <div>
                 <Dialog
@@ -134,11 +137,12 @@ export default class PopupForm extends React.Component {
                         this.props.getAdress(this.props.modifiedTraining).map(function(element, i){
                             return <Grid item xs={12} sm={6} md key={i}>
                                 <TextFieldCoord
-                                    // id="outlined-full-width"
+                                    id={element}
                                     key={i}
                                     label={element}
                                     style={{ margin: 8 }}
                                     defaultValue={this.getElementDetail(element)}
+                                    onChange={(e)=>{this.props.handleChange(e.target.value,this.props.modifiedTraining.sites.id,element)}}
                                     margin="normal"
                                     variant="outlined"
                                     required
@@ -180,42 +184,46 @@ export default class PopupForm extends React.Component {
                             </Grid>
                             <Grid item xs={12} sm={6} md={4} lg={4}>
                                 <TextFieldSession
-                                    id="date"
+                                    id={"subscribeStartDate" + index}
                                     label="Début des inscriptions"
                                     type="date"
-                                    defaultValue="2019-05-01"
+                                    defaultValue={this.getFormatedDate(rep.inscription.debut)}
+                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'debut')}}
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
                                 />
                                 <TextFieldSession
-                                    id="date"
+                                    id={"subscribeEndDate" + index}
                                     label="Fin des inscriptions"
                                     type="date"
-                                    defaultValue="2019-05-01"
+                                    defaultValue={this.getFormatedDate(rep.inscription.fin)}
+                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'fin')}}
                                     InputLabelProps={{
-                                    shrink: true,
-                                }}
+                                        shrink: true,
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={6} md={4} lg={4}>
                                 <TextFieldSession
-                                id="date"
-                                label="Début de la formation"
-                                type="date"
-                                defaultValue="2019-10-01"
-                                InputLabelProps={{
-                                shrink: true,
-                                }}
+                                    id={"TrainingStartDate" + index}
+                                    label="Début de la formation"
+                                    type="date"
+                                    defaultValue={this.getFormatedDate(rep.periode.debut)}
+                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'debut')}}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
                                 />
                                 <TextFieldSession
-                                id="date"
-                                label="Fin de la formation"
-                                type="date"
-                                defaultValue="2019-10-01"
-                                InputLabelProps={{
-                                shrink: true,
-                                }}
+                                    id={"TrainingEndDate" + index}
+                                    label="Fin de la formation"
+                                    type="date"
+                                    defaultValue={this.getFormatedDate(rep.periode.fin)}
+                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'fin')}}
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
                                 />
                             </Grid>
                         </GridSessions>
@@ -229,11 +237,6 @@ export default class PopupForm extends React.Component {
                             <IconButton
                                 aria-label={'Ajouter une session'}
                                 color='primary'
-                                onClick={() =>
-                                    this.setState({
-                                        // possibilities: this.state.possibilities.concat('')
-                                    })
-                                }
                             >
                                 <AddCircle />
                             </IconButton>
@@ -243,7 +246,7 @@ export default class PopupForm extends React.Component {
                         <Tooltip title={'Quitter en sauvegardant les modifications'}>
                             <DoneIcon
                                 aria-label='sauvegarder'
-                                onClick={() => this.props.handleClose('config')}
+                                onClick={() => this.props.validation()}
                             />
                         </Tooltip>
                         <Tooltip title={'Quitter sans sauvegarder'}>
