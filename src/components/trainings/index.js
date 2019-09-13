@@ -147,6 +147,15 @@ export default function Locat(props) {
     handleClickOpen();
   }
 
+  function addNewTempSession(callback) {
+    let newData = JSON.parse(JSON.stringify(modifiedTraining));
+    props.pushNewSession(newData);
+    setModifiedTraining(newData)
+    if (callback && typeof callback === "function") {
+      callback();
+    }
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={3}>
@@ -155,7 +164,7 @@ export default function Locat(props) {
           <Paper className={classes.paper}>
             {props.locations.map(function(location, i){
               return <ExpansionPanel
-              defaultExpanded="true"
+              // defaultExpanded
               key={i}>
                 <ExpansionPanelSummary
                   className={classes.exp}
@@ -239,6 +248,8 @@ export default function Locat(props) {
         handleChange={props.handleChange}
         validation= {props.validation}
         addNewSession={props.addNewSession}
+        addNewTempSession={addNewTempSession}
+        pushNewSession={props.pushNewSession}
       />
     </div>
   );

@@ -124,6 +124,7 @@ export default class PopupForm extends React.Component {
                                     key={i}
                                     label={element}
                                     style={{ margin: 8 }}
+                                    disabled={element !== 'voie'}
                                     defaultValue={this.getElementDetail(element)}
                                     onChange={(e)=>{this.props.handleChange(e.target.value,this.props.modifiedTraining.sites.id,element)}}
                                     margin="normal"
@@ -220,7 +221,8 @@ export default class PopupForm extends React.Component {
                             <IconButton
                                 aria-label={'Ajouter une session'}
                                 color='primary'
-                                onClick={() => this.props.addNewSession()}
+                                onClick={() => {
+                                    this.props.addNewTempSession(this.props.addNewSession(this.props.modifiedTraining.sites.id))}}
                             >
                                 <AddCircle />
                             </IconButton>
