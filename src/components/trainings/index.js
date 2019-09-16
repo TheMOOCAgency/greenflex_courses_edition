@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import 'typeface-roboto';
 import './index.css';
+import MySnacks from '../snackbar'
 import PopupForm from '../popup_form';
 import {Paper, makeStyles, Grid, Typography, Fab, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, CardContent, Card} from '@material-ui/core/';
 import AddIcon from '@material-ui/icons/Add';
@@ -137,13 +138,16 @@ export default function Locat(props) {
     setOpen(true);
   }
 
-  function handleClickClose() {
-    setModifiedTraining({})    
+  function handleClickClose(callback) {
+    setModifiedTraining({});
     setOpen(false);
+    if (callback && typeof callbak === 'function') {
+      callback();
+    }
   }
 
   function getModifiedTraining(location) {
-    setModifiedTraining({...location}) 
+    setModifiedTraining(JSON.parse(JSON.stringify(location)));
     handleClickOpen();
   }
 
@@ -242,14 +246,20 @@ export default function Locat(props) {
       <PopupForm
         open={open}
         setOpen={setOpen}
+        snackMessage={props.snackMessage}
         handleClose={handleClickClose}
         modifiedTraining={modifiedTraining}
         getAdress={getAdress}
+        cancelChange={props.cancelChange}
         handleChange={props.handleChange}
         validation= {props.validation}
         addNewSession={props.addNewSession}
         addNewTempSession={addNewTempSession}
         pushNewSession={props.pushNewSession}
+      />
+      <MySnacks
+        snackMessage={props.snackMessage}
+        clearSnack={props.clearSnack}
       />
     </div>
   );

@@ -113,7 +113,6 @@ export default class PopupForm extends React.Component {
 
                     </HeadContainer>
                     <Divider variant="middle" />
-                    {/* <DialogContent> */}
                         {/* COORDONNEES DE LA FORMATION */ }
                         <Grid container>
                         {this.props.modifiedTraining.sites &&
@@ -137,7 +136,6 @@ export default class PopupForm extends React.Component {
                             </Grid>
                         },this)}
                         </Grid>
-                    {/* </DialogContent> */}
                     <Divider variant="middle" />
                         {/* LISTE DES SESSIONS */}
                         {this.props.modifiedTraining.sessions &&
@@ -238,7 +236,7 @@ export default class PopupForm extends React.Component {
                         <Tooltip title={'Quitter sans sauvegarder'}>
                             <CloseIconStyled
                                 aria-label='Fermer le modal'
-                                onClick={() => this.props.handleClose('config')}
+                                onClick={() => this.props.handleClose(this.props.cancelChange)}
                             />
                         </Tooltip>
                     </Grid>
