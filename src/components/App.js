@@ -4,7 +4,7 @@ import Trainings from './trainings'
 // import APIMap from './APIMap'
 import './App.css'
 
-const locationsFilter = {ofID:0};
+const locationsFilter = { ofID: 0 };
 
 const filterLocations = function (obj) {
   if (locationsFilter) {
@@ -22,14 +22,14 @@ const filterLocations = function (obj) {
 }
 
 export default class extends Component {
-  constructor(props){
+  constructor(props) {
     super(props)
     this.state = {
-      savedLocations : [],
-      locations : [],
-      isLoading : true,
-      modifiedLocations : [],
-      snackMessage : {open: "false", type: 'info', message: '',},
+      savedLocations: [],
+      locations: [],
+      isLoading: true,
+      modifiedLocations: [],
+      snackMessage: { open: "false", type: 'info', message: '', },
     }
     this.handleChange = this.handleChange.bind(this)
     this.validInput = this.validInput.bind(this)
@@ -39,7 +39,7 @@ export default class extends Component {
     this.clearSnack = this.clearSnack.bind(this)
   }
 
-  handleChange(newValue,siteID,dataType,sessionid,date){
+  handleChange(newValue, siteID, dataType, sessionid, date) {
     var newData = JSON.parse(JSON.stringify(this.state.modifiedLocations))
 
     if (dataType && siteID && date && newValue) {
@@ -49,24 +49,39 @@ export default class extends Component {
     }
 
     this.setState({
-      modifiedLocations : newData
+      modifiedLocations: newData
     })
   }
 
   cancelChange() {
     this.setState({
-      modifiedLocations : this.state.locations,
-      snackMessage : {open: "true", type: 'info', message: 'modifications annulées',},
+      modifiedLocations: this.state.locations,
+      snackMessage: { open: "true", type: 'info', message: 'modifications annulées', },
     })
     console.log('cancelation ! ', this.state.snackMessage);
   }
 
-  validInput(callback){
+  validInput(callback) {
     let temp = JSON.parse(JSON.stringify(this.state.modifiedLocations))
+
+    let formData = new FormData();
+    formData.append('invited', JSON.stringify(temp))
+
+    fetch(window.location.href, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': window.props.csrfToken
+        },
+        body: formData
+    }).catch(function (error) {
+        alert('An error has occurred, no data has been sent !')
+    });
+
     this.setState({
-      locations : temp,
-      snackMessage : {open: "true", type: 'success', message: 'modifications enregistrées',},
+      locations: temp,
+      snackMessage: { open: "true", type: 'success', message: 'modifications enregistrées', },
     })
+
     console.log('validation ! ', this.state.snackMessage);
     if (callback) {
       callback();
@@ -75,7 +90,7 @@ export default class extends Component {
 
   clearSnack() {
     this.setState({
-      snackMessage : {open: "false", type: 'info', message: '',},
+      snackMessage: { open: "false", type: this.state.snackMessage.type, message: this.state.snackMessage.message, },
     })
   }
 
@@ -109,22 +124,26 @@ export default class extends Component {
     }
     this.pushNewSession(newData[currentSiteID]);
     this.setState({
-      modifiedLocations : newData
+      modifiedLocations: newData
     })
   }
 
   componentWillMount() {
-    this.setState({ 
-      savedLocations : JSON.parse(JSON.stringify(window.props.locations)),
-      modifiedLocations : JSON.parse(JSON.stringify(window.props.locations)),
-      locations : filterLocations(window.props.locations),
-      isLoading : false
+    let temp = {};
+    if (window.props && window.props.locations) {
+      temp = JSON.parse(JSON.stringify(window.props.locations));
+    }
+    this.setState({
+      savedLocations: temp,
+      modifiedLocations: temp,
+      locations: filterLocations(temp),
+      isLoading: false
     });
   }
 
-  render () {
+  render() {
     return <Fragment>
-      <Header/>
+      <Header />
 
       <Trainings
         locations={this.state.locations}

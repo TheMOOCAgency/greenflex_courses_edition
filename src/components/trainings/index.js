@@ -132,6 +132,7 @@ export default function Locat(props) {
   const classes = useStyles();
   
   const [open, setOpen] = useState(false);
+  const [modified, setModified] = useState(false);
   const [modifiedTraining, setModifiedTraining] = useState({ });
   
   function handleClickOpen() {
@@ -140,6 +141,7 @@ export default function Locat(props) {
 
   function handleClickClose(callback) {
     setModifiedTraining({});
+    setModified(false);
     setOpen(false);
     if (callback && typeof callbak === 'function') {
       callback();
@@ -154,7 +156,8 @@ export default function Locat(props) {
   function addNewTempSession(callback) {
     let newData = JSON.parse(JSON.stringify(modifiedTraining));
     props.pushNewSession(newData);
-    setModifiedTraining(newData)
+    setModifiedTraining(newData);
+    setModified(true);
     if (callback && typeof callback === "function") {
       callback();
     }
@@ -166,6 +169,10 @@ export default function Locat(props) {
         <Grid item xs={12}>
           <Paper variant="h6" component="h2" className={classes.paper}>LES FORMATIONS</Paper>
           <Paper className={classes.paper}>
+            {props.locations.length === 0 &&
+            <div>
+              Aucune formation actuellement existante.
+            </div>}
             {props.locations.map(function(location, i){
               return <ExpansionPanel
               // defaultExpanded
@@ -246,6 +253,8 @@ export default function Locat(props) {
       <PopupForm
         open={open}
         setOpen={setOpen}
+        modified={modified}
+        setModified={setModified}
         snackMessage={props.snackMessage}
         handleClose={handleClickClose}
         modifiedTraining={modifiedTraining}

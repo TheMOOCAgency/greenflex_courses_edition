@@ -41,6 +41,7 @@ export default class PopupForm extends React.Component {
         super(props)
         this.getElementDetail = this.getElementDetail.bind(this)
         this.getFormatedDate = this.getFormatedDate.bind(this)
+        this.closeAndCancelModifications = this.closeAndCancelModifications.bind(this)
     }
     getElementDetail(element) {
         return this.props.modifiedTraining.sites.adresse[element]
@@ -58,15 +59,19 @@ export default class PopupForm extends React.Component {
         return date
     }
 
+    closeAndCancelModifications() {
+        this.props.handleClose(this.props.cancelChange)
+    }
+
     render() {
-        // console.log(this.props.modifiedTraining);
+        // console.log(this.props.modified);
         return (
             <div>
                 <Dialog
                     open={this.props.open}
                     TransitionComponent={Transition}
                     keepMounted
-                    onClose={this.props.handleClose}
+                    onClose={this.closeAndCancelModifications}
                     aria-labelledby="alert-dialog-slide-title"
                     aria-describedby="alert-dialog-slide-description"
                     maxWidth="xl"
@@ -170,7 +175,10 @@ export default class PopupForm extends React.Component {
                                     label="Début des inscriptions"
                                     type="date"
                                     defaultValue={this.getFormatedDate(rep.inscription.debut)}
-                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'debut')}}
+                                    onChange={(e)=>{
+                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'debut');
+                                        this.props.setModified(true);
+                                    }}
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
@@ -180,7 +188,10 @@ export default class PopupForm extends React.Component {
                                     label="Fin des inscriptions"
                                     type="date"
                                     defaultValue={this.getFormatedDate(rep.inscription.fin)}
-                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'fin')}}
+                                    onChange={(e)=>{
+                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'fin');
+                                        this.props.setModified(true);
+                                    }}
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
@@ -192,7 +203,10 @@ export default class PopupForm extends React.Component {
                                     label="Début de la formation"
                                     type="date"
                                     defaultValue={this.getFormatedDate(rep.periode.debut)}
-                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'debut')}}
+                                    onChange={(e)=>{
+                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'debut');
+                                        this.props.setModified(true);
+                                    }}
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
@@ -202,7 +216,10 @@ export default class PopupForm extends React.Component {
                                     label="Fin de la formation"
                                     type="date"
                                     defaultValue={this.getFormatedDate(rep.periode.fin)}
-                                    onChange={(e)=>{this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'fin')}}
+                                    onChange={(e)=>{
+                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'fin');
+                                        this.props.setModified(true);
+                                    }}
                                     InputLabelProps={{
                                         shrink: true,
                                     }}
@@ -227,17 +244,26 @@ export default class PopupForm extends React.Component {
                         </Tooltip>
                     </Grid>
                     <Grid container justify='flex-end'>
-                        <Tooltip title={'Quitter en sauvegardant les modifications'}>
-                            <DoneIcon
+                        <Tooltip
+                            title={'Quitter en sauvegardant les modifications'}
+                        >
+                            <div>
+                            <IconButton
+                                disabled={!this.props.modified}
                                 aria-label='sauvegarder'
                                 onClick={() => this.props.validation(this.props.handleClose)}
-                            />
+                            >
+                                <DoneIcon />
+                            </IconButton>
+                            </div>
                         </Tooltip>
                         <Tooltip title={'Quitter sans sauvegarder'}>
-                            <CloseIconStyled
+                            <IconButton
                                 aria-label='Fermer le modal'
                                 onClick={() => this.props.handleClose(this.props.cancelChange)}
-                            />
+                            >
+                                <CloseIconStyled />
+                            </IconButton>
                         </Tooltip>
                     </Grid>
                 </Dialog>
