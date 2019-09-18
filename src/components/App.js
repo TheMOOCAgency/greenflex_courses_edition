@@ -37,10 +37,11 @@ export default class extends Component {
     this.pushNewSession = this.pushNewSession.bind(this)
     this.cancelChange = this.cancelChange.bind(this)
     this.clearSnack = this.clearSnack.bind(this)
+    this.deleteSession = this.deleteSession.bind(this)
   }
 
   handleChange(newValue, siteID, dataType, sessionid, date) {
-    var newData = JSON.parse(JSON.stringify(this.state.modifiedLocations))
+    let newData = JSON.parse(JSON.stringify(this.state.modifiedLocations))
 
     if (dataType && siteID && date && newValue) {
       newData[siteID].sessions[sessionid][dataType][date] = newValue
@@ -53,19 +54,32 @@ export default class extends Component {
     })
   }
 
-  cancelChange() {
+  deleteSession(siteID, id) {
+    let newData = JSON.parse(JSON.stringify(this.state.modifiedLocations));
+    newData[siteID].sessions.slice(id,1);
+    console.log(newData[siteID].sessions)
+
+    this.setState({
+      modifiedLocations: newData,
+    })
+  }
+
+  cancelChange(modified) {
     this.setState({
       modifiedLocations: this.state.locations,
-      snackMessage: { open: "true", type: 'info', message: 'modifications annulées', },
     })
-    console.log('cancelation ! ', this.state.snackMessage);
+    if (modified) {
+      this.setState({
+        snackMessage: { open: "true", type: 'info', message: 'modifications annulées', },
+      })
+    }
   }
 
   validInput(callback) {
     let temp = JSON.parse(JSON.stringify(this.state.modifiedLocations))
 
     let formData = new FormData();
-    formData.append('invited', JSON.stringify(temp))
+    formData.append('locations', JSON.stringify(temp))
 
     fetch(window.location.href, {
         method: 'POST',
@@ -82,7 +96,6 @@ export default class extends Component {
       snackMessage: { open: "true", type: 'success', message: 'modifications enregistrées', },
     })
 
-    console.log('validation ! ', this.state.snackMessage);
     if (callback) {
       callback();
     }
@@ -139,6 +152,9 @@ export default class extends Component {
       locations: filterLocations(temp),
       isLoading: false
     });
+    if (window.props && window.props.error) {
+      temp = JSON.parse(JSON.stringify(window.props.error));
+    }
   }
 
   render() {
@@ -156,6 +172,7 @@ export default class extends Component {
         updateState={this.updateState}
         cancelChange={this.cancelChange}
         clearSnack={this.clearSnack}
+        deleteSession={this.deleteSession}
       />
 
       {/* <APIMap

@@ -143,7 +143,7 @@ export default function Locat(props) {
     setModifiedTraining({});
     setModified(false);
     setOpen(false);
-    if (callback && typeof callbak === 'function') {
+    if (callback && typeof callback === 'function') {
       callback();
     }
   }
@@ -193,7 +193,11 @@ export default function Locat(props) {
                   <Typography variant="h6" component="h2" className={clsx(classes.heading, classes.formation_info_titre)}>
                     Coordonnées
                   </Typography>
-                  <Fab aria-label="delete" title="Supprimer la formation" className={clsx(classes.fab)}>
+                  <Fab 
+                    disabled={true}
+                    aria-label="delete"
+                    title="Supprimer la formation"
+                    className={clsx(classes.fab)}>
                     <DeleteIcon />
                   </Fab>
                   <Fab color="secondary" title="Modifier la formation" aria-label="edit" className={clsx(classes.fab)} onClick={() => getModifiedTraining(location)}>
@@ -244,7 +248,12 @@ export default function Locat(props) {
                 </ExpansionPanelDetails>
               </ExpansionPanel>
             })}
-            <Fab color="secondary" aria-label="add" title="Ajouter une formation" className={clsx(classes.fab, classes.add_new_formation)} onClick={handleClickOpen}>
+            <Fab
+              disabled={true}
+              color="secondary" 
+              aria-label="add" 
+              title="Ajouter une formation" 
+              className={clsx(classes.fab, classes.add_new_formation)} onClick={handleClickOpen}>
               <AddIcon />
             </Fab>
           </Paper>
@@ -265,6 +274,7 @@ export default function Locat(props) {
         addNewSession={props.addNewSession}
         addNewTempSession={addNewTempSession}
         pushNewSession={props.pushNewSession}
+        deleteSession={props.deleteSession}
       />
       <MySnacks
         snackMessage={props.snackMessage}

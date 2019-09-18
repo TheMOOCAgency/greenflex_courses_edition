@@ -60,7 +60,7 @@ export default class PopupForm extends React.Component {
     }
 
     closeAndCancelModifications() {
-        this.props.handleClose(this.props.cancelChange)
+        this.props.handleClose(this.props.cancelChange(this.props.modified))
     }
 
     render() {
@@ -145,90 +145,90 @@ export default class PopupForm extends React.Component {
                         {/* LISTE DES SESSIONS */}
                         {this.props.modifiedTraining.sessions &&
                             this.props.modifiedTraining.sessions.map((rep, index) => {
-                    return (
-                        <div
-                            key={index}
-                        >
-                        <GridSessions 
-                            alignContent="center"
-                            container
-                        >
-                            <Grid item xs={6} sm={6} md={1} lg={1}>
-                                <Tooltip title={'Supprimer la session'}>
-                                <IconButton
-                                    aria-label={'Supprimer la session'}
-                                    color='primary'
-                                    // onClick={() => this.switchOpenDelete('session', index)}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                                </Tooltip> 
-                            </Grid>
-                            <Grid item xs={6} sm={6} md={3} lg={3}>
-                                <PaddingTypography variant='h6' align='center'>
-                                {"Session " + (index + 1)}
-                                </PaddingTypography>
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={4} lg={4}>
-                                <TextFieldSession
-                                    id={"subscribeStartDate" + index}
-                                    label="Début des inscriptions"
-                                    type="date"
-                                    defaultValue={this.getFormatedDate(rep.inscription.debut)}
-                                    onChange={(e)=>{
-                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'debut');
-                                        this.props.setModified(true);
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                                <TextFieldSession
-                                    id={"subscribeEndDate" + index}
-                                    label="Fin des inscriptions"
-                                    type="date"
-                                    defaultValue={this.getFormatedDate(rep.inscription.fin)}
-                                    onChange={(e)=>{
-                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'fin');
-                                        this.props.setModified(true);
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={4} lg={4}>
-                                <TextFieldSession
-                                    id={"TrainingStartDate" + index}
-                                    label="Début de la formation"
-                                    type="date"
-                                    defaultValue={this.getFormatedDate(rep.periode.debut)}
-                                    onChange={(e)=>{
-                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'debut');
-                                        this.props.setModified(true);
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                                <TextFieldSession
-                                    id={"TrainingEndDate" + index}
-                                    label="Fin de la formation"
-                                    type="date"
-                                    defaultValue={this.getFormatedDate(rep.periode.fin)}
-                                    onChange={(e)=>{
-                                        this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'fin');
-                                        this.props.setModified(true);
-                                    }}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                        </GridSessions>
-                        <Divider variant="middle" />
-                        </div>
-                    );
+                        return (
+                            <div
+                                key={index}
+                            >
+                            <GridSessions 
+                                alignContent="center"
+                                container
+                            >
+                                <Grid item xs={6} sm={6} md={1} lg={1}>
+                                    <Tooltip title={'Supprimer la session'}>
+                                    <IconButton
+                                        aria-label={'Supprimer la session'}
+                                        color='primary'
+                                        onClick={() => this.props.deleteSession(rep.site_id, index)}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                    </Tooltip> 
+                                </Grid>
+                                <Grid item xs={6} sm={6} md={3} lg={3}>
+                                    <PaddingTypography variant='h6' align='center'>
+                                    {"Session " + (index + 1)}
+                                    </PaddingTypography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={4} lg={4}>
+                                    <TextFieldSession
+                                        id={"subscribeStartDate" + index}
+                                        label="Début des inscriptions"
+                                        type="date"
+                                        defaultValue={this.getFormatedDate(rep.inscription.debut)}
+                                        onChange={(e)=>{
+                                            this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'debut');
+                                            this.props.setModified(true);
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                    <TextFieldSession
+                                        id={"subscribeEndDate" + index}
+                                        label="Fin des inscriptions"
+                                        type="date"
+                                        defaultValue={this.getFormatedDate(rep.inscription.fin)}
+                                        onChange={(e)=>{
+                                            this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'inscription',index,'fin');
+                                            this.props.setModified(true);
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={4} lg={4}>
+                                    <TextFieldSession
+                                        id={"TrainingStartDate" + index}
+                                        label="Début de la formation"
+                                        type="date"
+                                        defaultValue={this.getFormatedDate(rep.periode.debut)}
+                                        onChange={(e)=>{
+                                            this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'debut');
+                                            this.props.setModified(true);
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                    <TextFieldSession
+                                        id={"TrainingEndDate" + index}
+                                        label="Fin de la formation"
+                                        type="date"
+                                        defaultValue={this.getFormatedDate(rep.periode.fin)}
+                                        onChange={(e)=>{
+                                            this.props.handleChange(this.getJsonDate(e.target.value),this.props.modifiedTraining.sites.id,'periode',index,'fin');
+                                            this.props.setModified(true);
+                                        }}
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                </Grid>
+                            </GridSessions>
+                            <Divider variant="middle" />
+                            </div>
+                        );
                     })}
                     {/* AJOUTER UNE SESSION */}
                     <Grid container justify='center'>
@@ -260,7 +260,8 @@ export default class PopupForm extends React.Component {
                         <Tooltip title={'Quitter sans sauvegarder'}>
                             <IconButton
                                 aria-label='Fermer le modal'
-                                onClick={() => this.props.handleClose(this.props.cancelChange)}
+                                onClick={() => 
+                                    this.props.handleClose(this.props.cancelChange(this.props.modified))}
                             >
                                 <CloseIconStyled />
                             </IconButton>
