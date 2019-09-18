@@ -130,7 +130,10 @@ export default class PopupForm extends React.Component {
                                     style={{ margin: 8 }}
                                     disabled={element !== 'voie'}
                                     defaultValue={this.getElementDetail(element)}
-                                    onChange={(e)=>{this.props.handleChange(e.target.value,this.props.modifiedTraining.sites.id,element)}}
+                                    onChange={(e)=>{
+                                        this.props.handleChange(e.target.value,this.props.modifiedTraining.sites.id,element)
+                                        this.props.setModified(true);
+                                    }}
                                     margin="normal"
                                     variant="outlined"
                                     required
@@ -153,12 +156,16 @@ export default class PopupForm extends React.Component {
                                 alignContent="center"
                                 container
                             >
+                                {/* SUPPRIMER UNE SESSION */}
                                 <Grid item xs={6} sm={6} md={1} lg={1}>
                                     <Tooltip title={'Supprimer la session'}>
                                     <IconButton
                                         aria-label={'Supprimer la session'}
                                         color='primary'
-                                        onClick={() => this.props.deleteSession(rep.site_id, index)}
+                                        onClick={() => {
+                                            this.props.deleteSessionInTrainingModified(this.props.deleteSession(rep.site_id, index));
+                                            this.props.setModified(true)
+                                        }}
                                     >
                                         <DeleteIcon />
                                     </IconButton>
@@ -251,7 +258,7 @@ export default class PopupForm extends React.Component {
                             <IconButton
                                 disabled={!this.props.modified}
                                 aria-label='sauvegarder'
-                                onClick={() => this.props.validation(this.props.handleClose)}
+                                onClick={() => this.props.validation(this.props.handleClose, this.props.modifiedTraining.sites.id)}
                             >
                                 <DoneIcon />
                             </IconButton>

@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     textAlign: 'center',
     color: theme.palette.text.secondary,
-    'background-color': '#C0DBDF',
+    // 'background-color': '#C0DBDF',
   },
   fab: {
     margin: theme.spacing(1),
@@ -36,10 +36,10 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1),
   },
   exp: {
-    'background-color': '#9BC4D1',
-    '&:hover': {
-      background: "#71BED1",
-    },
+    // 'background-color': '#9BC4D1',
+    // '&:hover': {
+    //   background: "#71BED1",
+    // },
   },
   root: {
     width: '100%',
@@ -60,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     'list-style-type': 'none',
     display: 'block',
-    'background-color': '#9BC4D1',
+    // 'background-color': '#9BC4D1',
     'text-align': 'left',
   },
   exp_header: {
@@ -82,12 +82,12 @@ const useStyles = makeStyles(theme => ({
   card: {
     minWidth: 275,
   },
-  coord: {
-    'background-color': '#C3D9DE',
-  },
-  session_card: {
-    'background-color': '#C0DBDF',
-  },
+  // coord: {
+  //   'background-color': '#C3D9DE',
+  // },
+  // session_card: {
+  //   'background-color': '#C0DBDF',
+  // },
   session_card_content: {
     'padding-top': '10px',
     'padding-bottom': '10px !important',
@@ -156,6 +156,16 @@ export default function Locat(props) {
   function addNewTempSession(callback) {
     let newData = JSON.parse(JSON.stringify(modifiedTraining));
     props.pushNewSession(newData);
+    setModifiedTraining(newData);
+    setModified(true);
+    if (callback && typeof callback === "function") {
+      callback();
+    }
+  }
+
+  function deleteSessionInTrainingModified(callback, id) {
+    let newData = JSON.parse(JSON.stringify(modifiedTraining));
+    newData.sessions.splice(id,1);
     setModifiedTraining(newData);
     setModified(true);
     if (callback && typeof callback === "function") {
@@ -273,6 +283,7 @@ export default function Locat(props) {
         validation= {props.validation}
         addNewSession={props.addNewSession}
         addNewTempSession={addNewTempSession}
+        deleteSessionInTrainingModified={deleteSessionInTrainingModified}
         pushNewSession={props.pushNewSession}
         deleteSession={props.deleteSession}
       />

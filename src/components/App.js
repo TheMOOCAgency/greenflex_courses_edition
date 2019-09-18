@@ -1,8 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import { Header } from './layouts'
 import Trainings from './trainings'
 // import APIMap from './APIMap'
 import './App.css'
+
+const moment = require('moment');
 
 const locationsFilter = { ofID: 0 };
 
@@ -38,6 +39,8 @@ export default class extends Component {
     this.cancelChange = this.cancelChange.bind(this)
     this.clearSnack = this.clearSnack.bind(this)
     this.deleteSession = this.deleteSession.bind(this)
+    this.checkModifiedDatas = this.checkModifiedDatas.bind(this)
+    this.checkDates = this.checkDates.bind(this)
   }
 
   handleChange(newValue, siteID, dataType, sessionid, date) {
@@ -56,8 +59,7 @@ export default class extends Component {
 
   deleteSession(siteID, id) {
     let newData = JSON.parse(JSON.stringify(this.state.modifiedLocations));
-    newData[siteID].sessions.slice(id,1);
-    console.log(newData[siteID].sessions)
+    newData[siteID].sessions.splice(id,1);
 
     this.setState({
       modifiedLocations: newData,
@@ -75,51 +77,100 @@ export default class extends Component {
     }
   }
 
-  validInput(callback) {
-    let temp = JSON.parse(JSON.stringify(this.state.modifiedLocations))
-
-    let formData = new FormData();
-    formData.append('locations', JSON.stringify(temp))
-
-    fetch(window.location.href, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': window.props.csrfToken
-        },
-        body: formData
-    }).catch(function (error) {
-        alert('An error has occurred, no data has been sent !')
-    });
-
-    this.setState({
-      locations: temp,
-      snackMessage: { open: "true", type: 'success', message: 'modifications enregistrées', },
-    })
-
-    if (callback) {
-      callback();
+  validInput(callback, siteID) {
+    let testResults = this.checkModifiedDatas(siteID);
+    if (testResults.status) {
+      let temp = JSON.parse(JSON.stringify(this.state.modifiedLocations))
+  
+      let formData = new FormData();
+      formData.append('locations', JSON.stringify(temp))
+  
+      fetch(window.location.href, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': window.props.csrfToken
+          },
+          body: formData
+      }).catch(function (error) {
+          alert('An error has occurred, no data has been sent !')
+      });
+  
+      this.setState({
+        locations: temp,
+        snackMessage: { open: "true", type: 'success', message: testResults.message, },
+      })
+  
+      if (callback) {
+        callback();
+      }
+    } else {
+      // Erreur dans les saisies !
+      this.setState({
+        snackMessage: { open: "true", type: 'error', message: testResults.message, },
+      })
     }
+  }
+
+  checkModifiedDatas(siteID) {
+    let thisTraining = this.state.modifiedLocations[siteID];
+    // Check coordinates validity
+    // Here we need a system (DB ?) to compare what user write and what coordinates exist
+
+    // Check dates validity
+    for (let i = 0; i < thisTraining.sessions.length; i++) {
+      let debutInscription = thisTraining.sessions[i].inscription.debut;
+      let finInscription = thisTraining.sessions[i].inscription.fin;
+      let debutPeriode = thisTraining.sessions[i].periode.debut;
+      let finPeriode = thisTraining.sessions[i].periode.fin;
+
+      // Date comparison between each start and end periode
+      if (!this.checkDates(debutInscription, finInscription)) {
+        return {status:false, message:'Session ' + (i+1) + ' : La date de fin d\'inscriptions ne doit pas être avant la date de début d\'inscription'}
+      }
+      if (!this.checkDates(debutPeriode, finPeriode)) {
+        return {status:false, message:'Session ' + (i+1) + ' : La date de fin de formation ne doit pas être avant la date de début de formation'}
+      }
+
+      // Date comparison between end of "inscription" and start of "periode"
+      if (!this.checkDates(finInscription, debutPeriode)) {
+        return {status:false, message:'Session ' + (i+1) + ' : La date de début de formation ne doit pas être avant la date de fin d\'inscriptions'}
+      }
+    }
+
+    return {status:true, message:'modifications enregistrées'}
+  }
+
+  checkDates(start, end) {
+    let formatedStart=start.split('/');
+    let formatedEnd=end.split('/');
+    formatedStart=formatedStart[2]+'-'+formatedStart[1]+'-'+formatedStart[0];
+    formatedEnd=formatedEnd[2]+'-'+formatedEnd[1]+'-'+formatedEnd[0];
+    if (moment(formatedStart).isAfter(formatedEnd)) {
+      return false
+    }
+    return true
   }
 
   clearSnack() {
     this.setState({
-      snackMessage: { open: "false", type: this.state.snackMessage.type, message: this.state.snackMessage.message, },
+      snackMessage: { open: 'false', type: this.state.snackMessage.type, message: this.state.snackMessage.message, },
     })
   }
 
   pushNewSession(training) {
+    moment.locale('en');
     training.sessions.push(
       {
         course_id: "course-v1%3Ainveest%2Binvest2019%2Binvest2019",
         enrollment_action: "enroll",
         id: this.state.locations[0].sessions.length,
         inscription: {
-          debut: "00/00/0000",
-          fin: "00/00/0000"
+          debut: moment().format('DD/MM/YYYY'),
+          fin: moment().format('DD/MM/YYYY')
         },
         periode: {
-          debut: "00/00/0000",
-          fin: "00/00/0000"
+          debut: moment().format('DD/MM/YYYY'),
+          fin: moment().format('DD/MM/YYYY')
         },
         site_id: locationsFilter.siteID,
       }
@@ -159,8 +210,6 @@ export default class extends Component {
 
   render() {
     return <Fragment>
-      <Header />
-
       <Trainings
         locations={this.state.locations}
         snackMessage={this.state.snackMessage}
