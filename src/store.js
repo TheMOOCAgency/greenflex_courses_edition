@@ -1,8 +1,0 @@
-export const locations = [
-  {lat: 44.837789, lng: -0.57918, organisme:"Formateurs de Bordeaux", region:"Nouvelle-Aquitaine", departement:"Gironde", date:"13/11/2019", dateFin:"29/01/2020", lieu: "Bordeaux", tel: "01.00.00.00.00", adresse: "4 rue Rambervilliers", ouverte: true, url: "", title:"Formation de Bordeaux"},
-  {lat: 47.216667, lng: -1.550000, organisme:"Formateurs de Nantes", region:"Pays de la Loire", departement:"Loire-Atlantique", date:"05/11/2019", dateFin:"15/01/2019", lieu: "Nantes", tel: "01.00.00.00.00", adresse: "4 rue Rambervilliers", ouverte: true, url: "", title:"Formation de Nantes"},
-  {lat: 48.8534, lng: 2.3488, organisme:"Formateurs de Paris", region:"Île-de-France", departement:"Paris", date:"16/10/2019", dateFin:"20/11/2019", lieu: "Paris", tel: "01.00.00.00.00", adresse: "4 rue Rambervilliers", ouverte: true, url: "", title:"Formation de Paris"},
-  {lat: 48.8534, lng: 2.3488, organisme:"Formateurs de Paris", region:"Île-de-France", departement:"Paris", date:"03/11/2019", dateFin:"22/12/2019", lieu: "Paris", tel: "01.00.00.00.00", adresse: "4 rue Rambervilliers", ouverte: true, url: "", title:"Formation de Paris"},
-  {lat: 45.7500, lng: 4.8500, organisme:"Formateurs de Lyon", region:"Auvergne-Rhône-Alpes", departement:"Rhône", date:"19/11/2019", dateFin:"28/01/2020", lieu: "Lyon", tel: "01.00.00.00.00", adresse: "4 rue Rambervilliers", ouverte: true, url: "", title:"Formation de Lyon"},
-  {lat: 43.600, lng: 1.433333, organisme:"Formateurs de Toulouse", region:"Occitanie", departement:"Haute-Garonne", date:"29/10/2019", dateFin:"10/12/2019", lieu: "Toulouse", tel: "01.00.00.00.00", adresse: "4 rue Rambervilliers", ouverte: true, url: "", title:"Formation de Toulouse"},
-]
