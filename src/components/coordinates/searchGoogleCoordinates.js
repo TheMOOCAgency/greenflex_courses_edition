@@ -1,217 +1,142 @@
 import React from "react";
 import Script from 'react-load-script'
+import { FormControl, Select } from '@material-ui/core/';
 
 class Search extends React.Component {
-// Define Constructor
+  // Define Constructor
   constructor(props) {
     super(props);
 
     // Declare State
     this.state = {
-      city: '',
-      query: ''
+      adressToSelect: [],
+      adressSelection:{},
     };
-    this.handleScriptLoad=this.handleScriptLoad.bind(this)
+    this.handleScriptLoad=this.handleScriptLoad.bind(this);
+    this.handlePlaceSelect=this.handlePlaceSelect.bind(this);
   }
 
-  handleScriptLoad() {
-    var element = document.getElementById('user_input_autocomplete_address');
-    console.log(document.getElementById('user_input_autocomplete_address'))
-    if (element) {
-      /*global google*/ // To disable any eslint 'google not defined' errors
-      this.autocomplete = new google.maps.places.Autocomplete(element, { types: ['geocode'] });
-      google.maps.event.addListener(this.autocomplete, 'place_changed', this.onPlaceChanged);
-      console.log(this.autocomplete)
+  handleScriptLoad = () => {
+    /*global google*/ // To disable any eslint 'google not defined' errors
+    // Autocomplete is used to get a list up to 5 address linked to user's input to populate the select menu
+    this.autocompleteService = new google.maps.places.AutocompleteService()
+    // PlacesService is used to get more informations about choosen address (code postal, departement, region, latitude, longitude)
+    this.placesService = new google.maps.places.PlacesService(document.getElementById('user_input_autocomplete_address'))
+  }
+
+  handleInputChange = (target) => {
+    if (target) {
+      this.autocompleteService.getPlacePredictions(
+        { 
+          input: target,
+          componentRestrictions: {country: 'fr'},
+          types: ['address'],
+        },
+        predictions => {
+          // console.log(predictions)
+          this.setState(
+            {
+              adressToSelect: predictions,
+            }
+          );
+        }
+      );
     }
   }
-
-  onPlaceChanged() {
-    var place = this.getPlace();
-
-    console.log(place);  // Uncomment this line to view the full object returned by Google API.
-
-    for (var i in place.address_components) {
-      var component = place.address_components[i];
-      for (var j in component.types) {  // Some types are ["country", "political"]
-        var type_element = document.getElementById(component.types[j]);
-        if (type_element) {
-          type_element.value = component.long_name;
+  
+  handlePlaceSelect = (e) => {
+    let address = {
+      voie: '',
+      ville: '',
+      departement: '',
+      region: '',
+      CP: 0,
+      pays: 'France',
+      lat: 0,
+      lng: 0
+    };
+    let placeID = this.state.adressToSelect[e.target.value].place_id
+    this.placesService.getDetails({placeId:placeID}, (results) => {
+      let components = results.address_components;
+      for (let i = 0; i < components.length; i++) {
+        if (components[i].types[0] === 'street_number') {
+          address.voie = components[i].long_name + ' ';
+        } else if (components[i].types[0] === 'route') {
+          address.voie += components[i].long_name;
+        } else if (components[i].types[0] === 'locality') {
+          address.ville = components[i].long_name;
+        } else if (components[i].types[0] === 'administrative_area_level_2') {
+          address.departement = components[i].long_name;
+        } else if (components[i].types[0] === 'administrative_area_level_1') {
+          address.region = components[i].long_name;
+        } else if (components[i].types[0] === 'country') {
+          address.pays = components[i].long_name;
+        } else if (components[i].types[0] === 'postal_code') {
+          address.CP = components[i].long_name;
         }
       }
-    }
+      address.lat = (results.geometry.viewport.Ya.g + results.geometry.viewport.Ya.h) / 2;
+      address.lng = (results.geometry.viewport.Ta.g + results.geometry.viewport.Ta.h) / 2;
+      this.props.handleGoogleAutocomplete(address)
+      this.setState(
+        {
+          adressToSelect: [],
+        }
+      );
+      document.getElementById('user_input_autocomplete_address').value = null;
+    })
   }
-
-  // componentDidMount() {
-  //   const that = this;
-  //   window.google.maps.event.addDomListener(window, 'load', function() {
-  //     that.handleScriptLoad('user_input_autocomplete_address');
-  //   });
-  // }
-
-  // // Define Constructor
-  // constructor(props) {
-  //   super(props);
-
-  //   // Declare State
-  //   this.state = {
-  //     city: '',
-  //     query: ''
-  //   };
-  //   this.handleScriptLoad=this.handleScriptLoad.bind(this);
-  //   this.handlePlaceSelect=this.handlePlaceSelect.bind(this);
-  // }
-
-  // handleScriptLoad = () => {
-  //   // Declare Options For Autocomplete
-  //   const options = {
-  //     types: ['(cities)'],
-  //   };
-
-  //   // Initialize Google Autocomplete
-  //   /*global google*/ // To disable any eslint 'google not defined' errors
-  //   this.autocomplete = new google.maps.places.Autocomplete(
-  //     document.getElementById('user_input_autocomplete_address'),
-  //     options,
-  //   );
-
-  //   // Avoid paying for data that you don't need by restricting the set of
-  //   // place fields that are returned to just the address components and formatted
-  //   // address.
-  //   this.autocomplete.setFields(['address_components', 'formatted_address']);
-
-  //   // Fire Event when a suggested name is selected
-  //   this.autocomplete.addListener('place_changed', this.handlePlaceSelect);
-  //   //console.log(this.autocomplete)
-  // }
-  
-  // handlePlaceSelect = () => {
-    
-  //   // Extract City From Address Object
-  //   const addressObject = this.autocomplete.getPlace();
-  //   const address = addressObject.address_components;
-    
-  //   console.log(address)
-
-  //   // Check if address is valid
-  //   if (address) {
-  //     // Set State
-  //     this.setState(
-  //       {
-  //         city: address[0].long_name,
-  //         query: addressObject.formatted_address,
-  //       }
-  //     );
-  //   }
-  // }
 
   render() {
     return ( 
       <>
-      <Script
-            url="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfaYbXApQjGJR7Zpz3dli17flR_mNGNpY&libraries=places"
-            onLoad={this.handleScriptLoad}
-          />
-            <div className="row">
-            <div className="col-sm-8 col-sm-offset-2">
-              <hr />
-              <form role="autoCompleteForm" className="form-horizontal">
-                <fieldset>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">Address</label>
-                    <div className="col-sm-8">
-                      <input
-                        id="user_input_autocomplete_address"
-                        name="user_input_autocomplete_address"
-                        className="form-control"
-                        placeholder="Indiquez votre adresse..."
-                      />
-                    </div>
+        <Script
+          url="https://maps.googleapis.com/maps/api/js?key=AIzaSyAfaYbXApQjGJR7Zpz3dli17flR_mNGNpY&libraries=places"
+          onLoad={this.handleScriptLoad}
+        />
+          <div className="row">
+          <div className="col-sm-8 col-sm-offset-2">
+            <hr />
+            <form className="form-horizontal">
+              <fieldset>
+                <div className="form-group">
+                  <label className="col-sm-4 control-label">Addresse à saisir</label>
+                  <div className="col-sm-8">
+                    <input
+                      id="user_input_autocomplete_address"
+                      name="user_input_autocomplete_address"
+                      onKeyPress={e => {if (e.key === 'Enter') e.preventDefault();}}
+                      className="form-control"
+                      placeholder="Indiquez votre adresse..."
+                      onChange={(e) => this.handleInputChange(e.target.value)}
+                      style={{ display: 'block', margin: 'auto' }}
+                    />
+                    {this.state.adressToSelect && this.state.adressToSelect.length > 0 &&
+                    <FormControl variant="outlined">
+                      <Select
+                        native
+                        value=""
+                        onChange={(e) => {this.handlePlaceSelect(e)}}
+                        inputProps={{
+                          name: 'adress',
+                          id: 'outlined-adress-native-simple',
+                        }}
+                      >
+                        <option value={'default'}>{this.state.adressToSelect.length + ' adresses disponibles'}</option>
+                        {this.state.adressToSelect.map(function(item, i){
+                            return <option key={i} value={i}>{item.description}</option>
+                          })
+                        }
+                      </Select>
+                    </FormControl>
+                    }
                   </div>
-                </fieldset>
-                <fieldset className="disabled">
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">
-                      <code>street_number</code>
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        id="street_number"
-                        name="street_number"
-                        disabled={true}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">
-                      <code>route</code>
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        id="route"
-                        name="route"
-                        disabled={true}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">
-                      <code>locality</code>
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        id="locality"
-                        name="locality"
-                        disabled={true}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">
-                      <code>administrative_area_level_1</code>
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        id="administrative_area_level_1"
-                        name="administrative_area_level_1"
-                        disabled={true}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">
-                      <code>postal_code</code>
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        id="postal_code"
-                        name="postal_code"
-                        disabled={true}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label className="col-sm-4 control-label">
-                      <code>country</code>
-                    </label>
-                    <div className="col-sm-8">
-                      <input
-                        id="country"
-                        name="country"
-                        disabled={true}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-                </fieldset>
-              </form>
-            </div>
+                </div>
+              </fieldset>
+            </form>
           </div>
-          </>
+        </div>
+      </>
     );
   }
 }

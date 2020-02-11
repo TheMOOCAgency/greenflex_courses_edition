@@ -105,10 +105,10 @@ export default class Sessions extends React.Component {
                 this.props.updateSessions(this.state.currentObject,this.props.index)
             })
         }else if(typeOfModification === "ouverte"){
-            if (e.target.value !== 'true') {
-                tempObject.ouverte = 'true';
+            if (tempObject.periode.ouverte !== true) {
+                tempObject.periode.ouverte = true;
             } else {
-                tempObject.ouverte = 'false';
+                tempObject.periode.ouverte = false;
             }
             this.setState({
                 currentObject : JSON.parse(JSON.stringify(tempObject))
@@ -159,8 +159,10 @@ export default class Sessions extends React.Component {
                     <Grid item style={{ marginRight:'10px' }}>Fermées</Grid>
                     <Grid item>
                         <AntSwitch
-                        value={this.props.rep.ouverte}
+                        checked={this.props.rep.periode.ouverte}
+                        // value={this.state.currentObject.periode.ouverte}
                         onChange={(e)=>{
+                            console.log(typeof this.props.rep.periode.ouverte, this.props.rep.periode.ouverte)
                             this.handleChange("ouverte",e);
                         }}
                         />

@@ -155,7 +155,7 @@ export default class PopupForm extends React.Component {
                     {/* LISTE DES SESSIONS */}
                     {this.props.modifiedTraining.sessions &&
                         this.props.modifiedTraining.sessions.map((rep, index) => {
-                        return <Sessions
+                            return <Sessions
                                 key={index}
                                 index={index}
                                 rep={rep}

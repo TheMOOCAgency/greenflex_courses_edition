@@ -256,7 +256,7 @@ export default class Trainings extends React.Component {
 
       // Check coordinates validity (only one training per OF per adress ('Voie'))
       for (let i = 0; i < this.props.locations.length; i++) {
-        if (dataToCheck.sites.adresse.voie === this.props.locations[i].sites.adresse.voie) {
+        if (dataToCheck.sites.adresse.voie === this.props.locations[i].sites.adresse.voie && dataToCheck.sites.adresse.ville === this.props.locations[i].sites.adresse.ville) {
           type = 'error';
           message = 'Il existe déjà une formation sur la ville de ' + dataToCheck.sites.adresse.ville + ' à l\'adresse ' + dataToCheck.sites.adresse.voie;
         }
@@ -319,10 +319,6 @@ export default class Trainings extends React.Component {
       let index = this.findTrainingBySiteID(this.state.deleteSiteId).index;
       let message = 'Formation de ' + this.findTrainingBySiteID(this.state.deleteSiteId).thisTraining.sites.adresse.ville + ' supprimée avec succès.'
       newData.splice(index, 1);
-  
-      // this.setState({
-      //   snackMessage: { open: 'true', type: 'success', message: message, },
-      // })
 
       this.saveChanges(this.state.modifiedLocations, message);
     })
@@ -407,11 +403,8 @@ export default class Trainings extends React.Component {
         course_id: this.props.course_id,
         enrollment_action: "enroll",
         id: this.state.modifiedLocations[0].sessions.length,
-        inscription: {
-          debut: moment().format('DD/MM/YYYY'),
-          fin: moment().format('DD/MM/YYYY')
-        },
         periode: {
+          ouverte: false,
           debut: moment().format('DD/MM/YYYY'),
           fin: moment().format('DD/MM/YYYY')
         },
@@ -540,7 +533,7 @@ export default class Trainings extends React.Component {
                               <Grid
                                 item xs
                               >
-                                {session.ouverte === 'true' ? (
+                                {session.periode.ouverte === true ? (
                                   <Typography>
                                       Inscriptions ouvertes
                                   </Typography>
