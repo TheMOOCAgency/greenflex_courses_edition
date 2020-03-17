@@ -42,6 +42,7 @@ const useStyles1 = makeStyles(theme => ({
   message: {
     display: 'flex',
     alignItems: 'center',
+    color: 'white',
   },
 }));
 
@@ -106,6 +107,7 @@ export default class SnackBar extends React.Component {
             onClose={this.handleClose}
             variant={this.props.snackMessage.type}
             message={this.props.snackMessage.message}
+            className='iconSnackbar'
           />
         </Snackbar>
       </div>
