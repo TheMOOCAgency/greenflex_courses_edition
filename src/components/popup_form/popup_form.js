@@ -1,6 +1,6 @@
 import React, {  } from 'react'
 import './index.css';
-import {Dialog, DialogContent, styled, Container, Typography, Grid, Slide, Tooltip, IconButton, Divider} from '@material-ui/core/';
+import {Dialog, DialogContent, styled, Container, Typography, Switch, withStyles, Grid, Slide, Tooltip, IconButton, Divider} from '@material-ui/core/';
 import AddCircle from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
@@ -19,11 +19,46 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const AntSwitch = withStyles(theme => ({
+    root: {
+      width: 28,
+      height: 16,
+      padding: 0,
+      display: 'flex',
+    },
+    switchBase: {
+      padding: 2,
+      color: theme.palette.grey[500],
+      '&$checked': {
+        transform: 'translateX(12px)',
+        color: theme.palette.common.white,
+        '& + $track': {
+          opacity: 1,
+          backgroundColor: '#52d869',
+          borderColor: '#52d869',
+        },
+      },
+    },
+    thumb: {
+      width: 12,
+      height: 12,
+      boxShadow: 'none',
+    },
+    track: {
+      border: `1px solid ${theme.palette.grey[500]}`,
+      borderRadius: 16 / 2,
+      opacity: 1,
+      backgroundColor: theme.palette.common.white,
+      height: '14px',
+    },
+    checked: {},
+}))(Switch);
+
 export default class PopupForm extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            temporaryDisplay :  JSON.parse(JSON.stringify(this.props.modifiedTraining)),
+            temporaryDisplay :  {...this.props.modifiedTraining},
         }
         this.getElementDetail = this.getElementDetail.bind(this)
         this.getFormatedDate = this.getFormatedDate.bind(this)
@@ -55,7 +90,7 @@ export default class PopupForm extends React.Component {
     componentDidUpdate(){
         if(this.props.open && Object.keys(this.state.temporaryDisplay).length === 0 && this.state.temporaryDisplay.constructor === Object){
             this.setState({
-                temporaryDisplay :  JSON.parse(JSON.stringify(this.props.modifiedTraining))
+                temporaryDisplay :  {...this.props.modifiedTraining}
             })
         }
     }
@@ -66,7 +101,7 @@ export default class PopupForm extends React.Component {
     
     updateTemporaryDisplay(tempData){
         this.setState({
-            temporaryDisplay : JSON.parse(JSON.stringify(tempData)),
+            temporaryDisplay : {...tempData},
         },()=>{
             this.tricks(this.state.temporaryDisplay)
         })
@@ -74,23 +109,28 @@ export default class PopupForm extends React.Component {
     }
 
     updateCoordinates(currentData){
-        let tempData = JSON.parse(JSON.stringify(currentData))
+        let tempData = {...currentData}
         this.updateTemporaryDisplay(tempData)
     }
 
     updateSessions(currentData,index){
-        let tempData = JSON.parse(JSON.stringify(this.props.modifiedTraining))
+        let tempData = {...this.props.modifiedTraining}
         tempData.sessions[index] = currentData
         this.updateTemporaryDisplay(tempData)
     }
 
     deleteSessionInTrainingModified(index) {
-        let tempData = JSON.parse(JSON.stringify(this.props.modifiedTraining));
+        let tempData = {...this.props.modifiedTraining};
         tempData.sessions.splice(index, 1);
         this.updateTemporaryDisplay(tempData)
     }
 
+    toggleFormation(e) {
+        console.log(e)
+    }
+
     render() {
+        
         return (
             <div>
                 <Dialog
@@ -101,6 +141,7 @@ export default class PopupForm extends React.Component {
                     aria-labelledby="alert-dialog-slide-title"
                     aria-describedby="alert-dialog-slide-description"
                     maxWidth="xl"
+                    scroll='body'
                 >
 
                     <HeadContainer maxWidth='md'>
@@ -112,14 +153,16 @@ export default class PopupForm extends React.Component {
                                     align='center'
                                     color='textPrimary'
                                     gutterBottom
-                                >{this.props.modifiedTraining.of.nom + ' ' + this.props.modifiedTraining.sites.adresse.ville}</Typography>
+                                >{this.props.modifiedTraining.sites.distancielle ?
+                                    this.props.modifiedTraining.of.nom + ' formation distancielle'
+                                    : this.props.modifiedTraining.of.nom + ' ' + this.props.modifiedTraining.sites.adresse.ville}</Typography>
                                 <Typography
                                     variant='h5'
                                     align='center'
                                     color='textSecondary'
                                     paragraph
                                 >
-                                    Cette interface permet de modifier les coordonées ou les sessions de la formation.
+                                    Cette interface permet de modifier {!this.props.modifiedTraining.sites.distancielle && 'les coordonées ou '}les sessions de la formation.
                                 </Typography>
                             </DialogContent>
                         ) : (
@@ -144,13 +187,14 @@ export default class PopupForm extends React.Component {
 
                     </HeadContainer>
                     <Divider variant="middle" />
+                    {this.props.modifiedTraining.sites && !this.props.modifiedTraining.sites.distancielle &&
                     <Coordinates
                         modifiedTraining={this.props.modifiedTraining}
                         coordinatesTrad={this.props.coordinatesTrad}
                         getKeyAdressTrad={this.props.getKeyAdressTrad}
                         updateCoordinates={this.updateCoordinates}
                         setModified={this.props.setModified}
-                    />
+                    />}
                     <Divider variant="middle" />
                     {/* LISTE DES SESSIONS */}
                     {this.props.modifiedTraining.sessions &&
@@ -159,6 +203,7 @@ export default class PopupForm extends React.Component {
                                 key={index}
                                 index={index}
                                 rep={rep}
+                                distancielle={this.props.modifiedTraining.sites.distancielle}
                                 modifiedTraining={this.props.modifiedTraining}
                                 deleteSessionInTrainingModified={this.deleteSessionInTrainingModified}
                                 setModified={this.props.setModified}

@@ -75,8 +75,8 @@ class Search extends React.Component {
           address.CP = components[i].long_name;
         }
       }
-      address.lat = (results.geometry.viewport.Ya.i + results.geometry.viewport.Ya.i) / 2;
-      address.lng = (results.geometry.viewport.Ta.i + results.geometry.viewport.Ta.i) / 2;
+      address.lat = results.geometry.location.lat();
+      address.lng = results.geometry.location.lng();
       this.props.handleGoogleAutocomplete(address)
       this.setState(
         {

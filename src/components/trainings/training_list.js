@@ -5,10 +5,11 @@ import MySnacks from '../snackbar/snackbar'
 import PopupForm from '../popup_form/popup_form';
 import Modal from '../delete_modal/modal';
 import {Paper, Grid, Typography, Fab, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, CardContent, Card} from '@material-ui/core/';
-import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import LanguageIcon from '@material-ui/icons/Language';
+import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 
 const moment = require('moment');
 
@@ -33,6 +34,7 @@ export default class Trainings extends React.Component {
       deleteSiteId: 0,
       modifiedTraining: {},
       modifiedLocations: [],
+      hasDistancielle: false,
       snackMessage: { open: "false", type: 'info', message: '', },
     }
     this.getModifiedTraining = this.getModifiedTraining.bind(this);
@@ -54,7 +56,26 @@ export default class Trainings extends React.Component {
     this.openDeleteModal = this.openDeleteModal.bind(this);
     this.saveChanges = this.saveChanges.bind(this)
   }
-
+  
+  checkDistancielleExistance(locations){
+    let hasDistancielle = false
+    for (let i = 0; i < locations.length; i++) {
+      if (locations[i].sites.distancielle) {
+        hasDistancielle = true
+      }
+    }
+    return hasDistancielle
+  }
+  
+  componentDidMount(){
+    let hasDistancielle = false
+    this.setState({
+      hasDistancielle: this.checkDistancielleExistance(this.props.locations),
+    },()=>{
+      console.log(hasDistancielle)
+    })
+  }
+  
   saveChanges(newData, message){
     let that = this;
     let formData = new FormData();
@@ -74,10 +95,12 @@ export default class Trainings extends React.Component {
         if (message) {
           that.setState({
             snackMessage: { open: 'true', type: 'success', message: message, },
+            hasDistancielle: that.checkDistancielleExistance(that.props.locations),
           })
         } else {
           that.setState({
             snackMessage: { open: 'true', type: 'success', message: 'modification enregistrée avec succès', },
+            hasDistancielle: that.checkDistancielleExistance(that.props.locations),
           })
         }
 
@@ -168,53 +191,83 @@ export default class Trainings extends React.Component {
   }
 
   getModifiedTraining(location) {
-    this.setModifiedTraining(JSON.parse(JSON.stringify(location)));
+    this.setModifiedTraining({...location});
     this.handleClickOpen();
   }
 
-  createNewTraining() {
-    let newTraining =
-    {
-      course_id: this.props.course_id,
-      of: {
-        nom: this.props.of_name,
-        id: 0,
-        value: this.props.of_value
-      },
-      sites: {
-        id: this.generateSiteID(),
-        of_id: 0,
-        nom: "Nouvelle formation",
-        tel: "01.00.00.00",
-        position: {
-          lat: 44.837789,
-          lng: -0.57918
+  createNewTraining(typeOfFormation) {
+    let newTraining
+    if (typeOfFormation === 'presentielle'){
+      newTraining =
+      {
+        "course_id": this.props.course_id,
+        "of": {
+          "nom": this.props.of_name,
+          "id": 0,
+          "value": this.props.of_value
         },
-        adresse: {
-          voie: "Inconnu",
-          ville: "Bordeaux",
-          CP: 3300,
-          pays: "France",
-          departement: "Gironde",
-          region: "Nouvelle-Aquitaine"
-        }
-      },
-      nom: "Nouvelle formation",
-      sessions: [
-        {
-          enrollment_action: "enroll",
-          id: 0,
-          site_id: 0,
-          periode: {
-            debut: moment().format('DD/MM/YYYY'),
-            fin: moment().format('DD/MM/YYYY'),
-            ouverte: true,
+        "sites": {
+          "id": this.generateSiteID(),
+          "of_id": 0,
+          "nom": "Nouvelle formation",
+          "tel": "01.00.00.00",
+          "position": {
+            "lat": 44.837789,
+            "lng": -0.57918
+          },
+          "adresse": {
+            "voie": "Inconnu",
+            "ville": "Bordeaux",
+            "CP": 3300,
+            "pays": "France",
+            "departement": "Gironde",
+            "region": "Nouvelle-Aquitaine"
           }
         },
-      ]
-    };
+        "nom": "Nouvelle formation",
+        "sessions": [
+          {
+            "enrollment_action": "enroll",
+            "id": 0,
+            "site_id": 0,
+            "periode": {
+              "debut": moment().format('DD/MM/YYYY'),
+              "fin": moment().format('DD/MM/YYYY'),
+              "ouverte": true,
+            }
+          },
+        ]
+      }
+    } else {
+      newTraining = {
+        "course_id": this.props.course_id,
+        "of": {
+            "nom": this.props.of_name,
+            "id": 0,
+            "value": this.props.of_name
+        },
+        "sites": {
+            "distancielle": true,
+            "id": this.generateSiteID(),
+        },
+        "nom": "Nouvelle formation",
+        "sessions": [{
+            "course_id": this.props.course_id,
+            "enrollment_action": "enroll",
+            "periode": {
+                "ouverte": true,
+                "demi_journee_1": ["matin",moment().format('DD/MM/YYYY')],
+                "demi_journee_2": ["soir",moment().format('DD/MM/YYYY')],
+                "demi_journee_3": ["matin",moment().format('DD/MM/YYYY')],
+                "demi_journee_4": ["soir",moment().format('DD/MM/YYYY')]
+            },
+            "site_id": 0,
+            "id": 0
+        }]
+      }
+    }
 
-    let newData = JSON.parse(JSON.stringify(this.state.modifiedLocations));
+    let newData = [...this.state.modifiedLocations];
     newData.push(newTraining);
 
     this.setState({
@@ -241,26 +294,30 @@ export default class Trainings extends React.Component {
     let message = 'modifications enregistrées';
 
     // Check dates validity
-    for (let i = 0; i < dataToCheck.sessions.length; i++) {
-      let debutPeriode = dataToCheck.sessions[i].periode.debut;
-      let finPeriode = dataToCheck.sessions[i].periode.fin;
-      
-      if (!this.checkDates(debutPeriode, finPeriode)) {
-        type = 'error';
-        message = 'Session ' + (i + 1) + ' : La date de fin de formation ne doit pas être avant la date de début de formation';
-      }
-    }
+    if (!dataToCheck.sites.distancielle){
+        for (let i = 0; i < dataToCheck.sessions.length; i++) {
+          let debutPeriode = dataToCheck.sessions[i].periode.debut;
+          let finPeriode = dataToCheck.sessions[i].periode.fin;
+          
+          if (!this.checkDates(debutPeriode, finPeriode)) {
+            type = 'error';
+            message = 'Session ' + (i + 1) + ' : La date de fin de formation ne doit pas être avant la date de début de formation';
+          }
+        }
 
-    if (this.state.creatingNewTraining) {
-      message = 'Nouvelle formation créée, à ' + dataToCheck.sites.adresse.ville;
+      if (this.state.creatingNewTraining) {
+          message = 'Nouvelle formation créée, à ' + dataToCheck.sites.adresse.ville;
 
-      // Check coordinates validity (only one training per OF per adress ('Voie'))
-      for (let i = 0; i < this.props.locations.length; i++) {
-        if (dataToCheck.sites.adresse.voie === this.props.locations[i].sites.adresse.voie && dataToCheck.sites.adresse.ville === this.props.locations[i].sites.adresse.ville) {
-          type = 'error';
-          message = 'Il existe déjà une formation sur la ville de ' + dataToCheck.sites.adresse.ville + ' à l\'adresse ' + dataToCheck.sites.adresse.voie;
+        // Check coordinates validity (only one training per OF per adress ('Voie'))
+        for (let i = 0; i < this.props.locations.length; i++) {
+          if (dataToCheck.sites.adresse.voie === this.props.locations[i].sites.adresse.voie && dataToCheck.sites.adresse.ville === this.props.locations[i].sites.adresse.ville) {
+            type = 'error';
+            message = 'Il existe déjà une formation sur la ville de ' + dataToCheck.sites.adresse.ville + ' à l\'adresse ' + dataToCheck.sites.adresse.voie;
+          }
         }
       }
+    } else {
+      message = 'Nouvelle formation distancielle créée'
     }
     
     if (type === 'success'){
@@ -312,12 +369,19 @@ export default class Trainings extends React.Component {
   }
 
   deleteTraining() {
-    let newData = JSON.parse(JSON.stringify(this.props.locations));
+    let newData = [...this.props.locations];
+    const thisTraining = this.findTrainingBySiteID(this.state.deleteSiteId).thisTraining
+    let localisation
+    if (thisTraining.sites.distancielle) {
+      localisation = 'distancielle '
+    } else {
+      localisation = 'de ' + thisTraining.sites.adresse.ville
+    }
     this.setState({
       modifiedLocations: newData,
     },()=>{
       let index = this.findTrainingBySiteID(this.state.deleteSiteId).index;
-      let message = 'Formation de ' + this.findTrainingBySiteID(this.state.deleteSiteId).thisTraining.sites.adresse.ville + ' supprimée avec succès.'
+      let message = 'Formation ' + localisation + ' supprimée avec succès.'
       newData.splice(index, 1);
 
       this.saveChanges(this.state.modifiedLocations, message);
@@ -333,7 +397,7 @@ export default class Trainings extends React.Component {
   }
 
   deleteSession(siteID, id, callback) {
-    let newData = JSON.parse(JSON.stringify(this.state.modifiedLocations));
+    let newData = [...this.state.modifiedLocations];
     let index = this.findTrainingBySiteID(siteID).index;
     newData[index].sessions.splice(id, 1);
 
@@ -358,8 +422,8 @@ export default class Trainings extends React.Component {
     }
   }
 
-  addNewTraining() {
-    let newTraining = this.createNewTraining();
+  addNewTraining(typeOfFormation) {
+    let newTraining = this.createNewTraining(typeOfFormation);
     this.setState({
       modifiedTraining: newTraining,
       creatingNewTraining: true,
@@ -378,7 +442,7 @@ export default class Trainings extends React.Component {
   }
 
   validation (newData) {
-    let tempData = JSON.parse(JSON.stringify(this.props.locations));
+    let tempData = [...this.props.locations];
 
     // if it is not a new training, let's update an existing one
     if (!this.state.creatingNewTraining) {
@@ -397,24 +461,37 @@ export default class Trainings extends React.Component {
   }
 
   pushNewSession(training) {
+    const distancielle = training.sites.distancielle
     moment.locale('en');
+    let periode
+    if (distancielle) {
+      periode = {
+        ouverte: false,
+        demi_journee_1: ['matin',moment().format('DD/MM/YYYY')],
+        demi_journee_2: ['matin',moment().format('DD/MM/YYYY')],
+        demi_journee_3: ['matin',moment().format('DD/MM/YYYY')],
+        demi_journee_4: ['matin',moment().format('DD/MM/YYYY')]
+      }
+    } else {
+      periode = {
+        ouverte: false,
+        debut: moment().format('DD/MM/YYYY'),
+        fin: moment().format('DD/MM/YYYY')
+      }
+    }
     training.sessions.push(
       {
         course_id: this.props.course_id,
         enrollment_action: "enroll",
         id: this.state.modifiedLocations[0].sessions.length,
-        periode: {
-          ouverte: false,
-          debut: moment().format('DD/MM/YYYY'),
-          fin: moment().format('DD/MM/YYYY')
-        },
+        periode: periode,
         site_id: training.sites.id,
       }
     )
   }
 
   addNewSession(dataToUpdate, callback) {
-    let newData = JSON.parse(JSON.stringify(this.props.locations))
+    let newData = [...this.props.locations]
     let index = this.findTrainingBySiteID(dataToUpdate.sites.id).index
     newData[index] = dataToUpdate;
     this.setState({
@@ -455,12 +532,14 @@ export default class Trainings extends React.Component {
                         component="h2"
                         className="heading"
                       >
-                        {location.of.nom + ' ' + location.sites.adresse.ville}
+                        {location.sites.distancielle ?
+                        location.of.nom + ' ' + 'Formations distancielles'
+                        : location.of.nom + ' ' + location.sites.adresse.ville}
                       </Typography>
                       <Typography
                         display='inline'
                       >
-                        {' (' + location.sites.adresse.voie + ')'}
+                        {!location.sites.distancielle && ' (' + location.sites.adresse.voie + ')'}
                       </Typography>
                     </div>
                   </ExpansionPanelSummary>
@@ -546,12 +625,26 @@ export default class Trainings extends React.Component {
                               <Grid
                                 item xs
                               >
-                                <Typography color="textSecondary">
-                                  période
-                                </Typography>
-                                <Typography variant="body2" component="p">
-                                  du {session.periode.debut} au {session.periode.fin}
-                                </Typography>
+                                {location.sites.distancielle ?
+                                    <>
+                                    <Typography color="textSecondary" className="distDateTitle">
+                                      Demi journées
+                                    </Typography>
+                                    <ul>
+                                      <li className="distDate">1 : {session.periode.demi_journee_1[1]} ({session.periode.demi_journee_1[0]})</li>
+                                      <li className="distDate">2 : {session.periode.demi_journee_2[1]} ({session.periode.demi_journee_2[0]})</li>
+                                      <li className="distDate">3 : {session.periode.demi_journee_3[1]} ({session.periode.demi_journee_3[0]})</li>
+                                      <li className="distDate">4 : {session.periode.demi_journee_4[1]} ({session.periode.demi_journee_4[0]})</li>
+                                    </ul>
+                                    </>
+                                  : <>
+                                    <Typography color="textSecondary">
+                                      période
+                                    </Typography>
+                                    <Typography variant="body2" component="p">
+                                    du {session.periode.debut} au {session.periode.fin}
+                                    </Typography>
+                                    </>}
                               </Grid>
                             </Grid>
                           </CardContent>
@@ -565,10 +658,18 @@ export default class Trainings extends React.Component {
                 className="modifierButton"
                 color="secondary" 
                 aria-label="add" 
-                title="Ajouter une formation" 
-                onClick={this.addNewTraining}>
-                <AddIcon />
+                title="Ajouter une formation présentielle" 
+                onClick={() => this.addNewTraining('presentielle')}>
+                <LocalLibraryIcon />
               </Fab>
+              {!this.state.hasDistancielle && <Fab
+                className="modifierButton"
+                color="secondary" 
+                aria-label="add" 
+                title="Ajouter une formation distancielle" 
+                onClick={() => this.addNewTraining('distancielle')}>
+                <LanguageIcon />
+              </Fab>}
             </Paper>
           </Grid>
         </Grid>
@@ -591,6 +692,7 @@ export default class Trainings extends React.Component {
           checkModifiedDatas={this.checkModifiedDatas}
           addNewSession={this.addNewSession}
           coordinatesTrad={coordinatesTrad}
+          hasDistancielle={this.state.hasDistancielle}
         />
         <MySnacks
           snackMessage={this.state.snackMessage}
