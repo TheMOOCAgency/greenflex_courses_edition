@@ -310,7 +310,7 @@ export default class Trainings extends React.Component {
 
         // Check coordinates validity (only one training per OF per adress ('Voie'))
         for (let i = 0; i < this.props.locations.length; i++) {
-          if (dataToCheck.sites.adresse.voie === this.props.locations[i].sites.adresse.voie && dataToCheck.sites.adresse.ville === this.props.locations[i].sites.adresse.ville) {
+          if (!this.props.locations[i].sites.distancielle && (dataToCheck.sites.adresse.voie === this.props.locations[i].sites.adresse.voie && dataToCheck.sites.adresse.ville === this.props.locations[i].sites.adresse.ville)) {
             type = 'error';
             message = 'Il existe déjà une formation sur la ville de ' + dataToCheck.sites.adresse.ville + ' à l\'adresse ' + dataToCheck.sites.adresse.voie;
           }
