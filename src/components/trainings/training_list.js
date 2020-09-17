@@ -244,7 +244,7 @@ export default class Trainings extends React.Component {
         "of": {
             "nom": this.props.of_name,
             "id": 0,
-            "value": this.props.of_name
+            "value": this.props.of_value
         },
         "sites": {
             "distancielle": true,
