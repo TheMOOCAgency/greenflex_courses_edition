@@ -153,8 +153,8 @@ export default class Sessions extends React.Component {
                     container
                     key={i}
                 >
-                    <Grid item xs={4} sm={1} style={{ marginRight:'10px' }}>{this.props.rep.periode['demi_journee_'+i][0] === 'matin' ? 'Matin' : 'Soir'}</Grid>
-                    <Grid item xs={4} sm={1}>
+                    <Grid item xs={6} sm={4} style={{ marginRight:'10px' }}>{this.props.rep.periode['demi_journee_'+i][0] === 'matin' ? 'Matin' : 'Après-midi'}</Grid>
+                    <Grid item xs={6} sm={1}>
                         <AntSwitch
                         checked={this.props.rep.periode['demi_journee_'+i] && this.props.rep.periode['demi_journee_'+i][0] !== 'matin'}
                         onChange={(e)=>{
@@ -164,7 +164,7 @@ export default class Sessions extends React.Component {
                     </Grid>
                 
                     <TextFieldSession
-                        xs={12} sm={9} md={9} lg={9}
+                        xs={12} sm={7}
                         id={"TrainingDemi_journee_"+i}
                         label={"demi journée "+i}
                         type="date"
